@@ -37,8 +37,10 @@ public:
 	virtual bool is_lenyilos_widget();
 	virtual void setfocused();
 	void HozzafuzMezok(string text);
+	void Torolmezo(string text);
 	string getvalasztott();
 	int getvalasztottszam();
+	void kicserelmezok(vector<string> csere);
 
 };
 

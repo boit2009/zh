@@ -12,8 +12,14 @@ ChoosingWidget::ChoosingWidget(int x, int y, int sx, int sy, vector<string> mezo
         _nyiljon_e_le=true;
     else
         _nyiljon_e_le=false;
-	_mezok.resize(mezok.size());
-	_mezok=mezok;
+
+
+    if(mezok.size()==0)
+        _is_focusable=false;
+    _mezok.resize(mezok.size());
+    _mezok=mezok;
+
+
 	_valasztott=0;
 	_focused=false;
 	if(!_nyiljon_e_le)
@@ -32,13 +38,7 @@ ChoosingWidget::ChoosingWidget(int x, int y, int sx, int sy, vector<string> mezo
 			maxi=gout.twidth(_mezok[i]);
 	}
 	_sav_szelesseg=maxi+10;
-	if(_x+_sav_szelesseg>700)
-		_x=700-_sav_szelesseg-1;
-	if(_y==700-1-_size_y) {
-		_y=700-_size_y-2*_sav_magassag-3;
-		_kifer_e_minden_mezo=false;
-		_mennyi_fer_ki=2;
-	}
+
 
 }
 ChoosingWidget::ChoosingWidget(int x, int y, int sx, int sy, vector<string> mezok, int lenyilashossz, int savmagassag,int lenyilos_e) :Widget(x,y,sx,sy)
@@ -47,14 +47,17 @@ ChoosingWidget::ChoosingWidget(int x, int y, int sx, int sy, vector<string> mezo
         _nyiljon_e_le=true;
     else
         _nyiljon_e_le=false;
-	_mezok.resize(mezok.size());
-	_mezok=mezok;
+
+    _mezok.resize(mezok.size());
+    _mezok=mezok;
 	_valasztott=0;
 	_focused=false;
 	if(!_nyiljon_e_le)
         _gordul_e=true;
     else
         _gordul_e=false;
+     if(mezok.size()==0)
+        _is_focusable=false;
 
 	_sav_magassag=savmagassag;
 	if(lenyilashossz>_mezok.size()*_sav_magassag) {
@@ -127,7 +130,9 @@ void ChoosingWidget::draw()
 
 
 	}
-	if(gout.twidth(_mezok[_valasztott])>_size_x-20-15) {
+	if(_mezok.size()!=0)
+	{
+	    if(gout.twidth(_mezok[_valasztott])>_size_x-20-15) {
 		string ideiglenes="";
 		for (unsigned int i=0; i<_mezok[_valasztott].size(); i++) {
 			if(gout.twidth(ideiglenes)<_size_x-20-15)
@@ -239,6 +244,7 @@ void ChoosingWidget::draw()
 
 
 	gout<<stamp(nyil,_x+_size_x-15,_y+_size_y-20);
+	}
 
 
 }
@@ -246,7 +252,8 @@ void ChoosingWidget::handle(event ev)
 {
 	if (ev.type == ev_mouse && is_selected(ev.pos_x, ev.pos_y) && ev.button==btn_left)
 		{
-		    _focused=true;
+		    if(_mezok.size()!=0)
+                _focused=true;
             if(!_nyiljon_e_le)
                 _gordul_e=true;
 		}
@@ -446,6 +453,61 @@ void ChoosingWidget::setfocused()
 }
 void ChoosingWidget::HozzafuzMezok(string text)
 {
+    _valasztott=0;
     _mezok.push_back(text);
+    if(_mezok.size()==0)
+        _is_focusable=false;
+    else
+        _is_focusable=true;
+}
+string ChoosingWidget::getvalasztott()
+{
+   return _mezok[_valasztott];
+}
+void ChoosingWidget::Torolmezo(string text)
+{
+    _valasztott=0;
+    vector<string> ujmezok;
+    for(int i=0;i<_mezok.size();i++)
+    {
+        if(text==_mezok[i])
+        {
+            _mezok.erase(_mezok.begin()+i, _mezok.begin()+i);
+        }
+        else
+            ujmezok.push_back(_mezok[i]);
+    }
+    _mezok.clear();
+    for (unsigned int i=0;i<ujmezok.size();i++)
+    {
+        _mezok.push_back(ujmezok[i]);
+    }
+   if(_mezok.size()==0)
+        _is_focusable=false;
+    else
+        _is_focusable=true;
+
+}
+void ChoosingWidget::kicserelmezok(vector<string> csere)
+{
+    _mezok.clear();
+    for (unsigned int i=0;i<csere.size();i++)
+    {
+        _mezok.push_back(csere[i]);
+    }
+
+    int maxi=_size_x;
+	for (unsigned int i=0; i<_mezok.size(); i++) {
+		if( gout.twidth(_mezok[i])>maxi)
+			maxi=gout.twidth(_mezok[i]);
+	}
+	_sav_szelesseg=maxi+10;
+	_valasztott=0;
+
+	if(_mezok.size()==0)
+        _is_focusable=false;
+    else
+        _is_focusable=true;
+
 }
 
